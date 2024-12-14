@@ -1,29 +1,36 @@
 import google.generativeai as genai
 from django.conf import settings
 
-
+# Configuring the Gemini API key
 genai.configure(api_key=settings.API_KEY)
 
-def generate_blog_title(content: str) -> str:
+
+def generate_blog_titles(content: str, num_titles: int = 3) -> list:
     """
-    Generates a creative, short, SEO-friendly blog title using the Gemini Pro model.
+    Generates multiple creative, short, SEO-friendly blog titles using the Gemini Pro model.
 
     Args:
-        content (str): Blog content for which the title needs to be generated.
+        content (str): Blog content for which the titles need to be generated.
+        num_titles (int): Number of title suggestions to generate. Default is 3.
 
     Returns:
-        str: Generated blog title.
+        list: List of generated blog titles.
     """
     if not content.strip():
         raise ValueError("Content cannot be empty.")
-    
-    # Prepare the prompt
-    input_prompt = f"Generate a creative, short, SEO-friendly blog title for the following content:\n\n{content}\n\nTitle:"
-    
+
+    input_prompt = (
+        f"Generate {num_titles} creative, short, SEO-friendly blog titles "
+        f"for the following content:\n\n{content}\n\nTitles:"
+    )
+
     try:
-        # Generating the title using Gemini Pro
-        model = genai.GenerativeModel("gemini-pro") 
+        # Using Gemini Pro to generate titles
+        model = genai.GenerativeModel("gemini-pro")
         response = model.generate_content(input_prompt)
-        return response.text.strip()
+
+        # Splitting the response text into separate titles
+        titles = [title.strip() for title in response.text.split("\n") if title.strip()]
+        return titles[:num_titles]
     except Exception as e:
-        raise RuntimeError(f"Error generating blog title: {str(e)}")
+        raise RuntimeError(f"Error generating blog titles: {str(e)}")

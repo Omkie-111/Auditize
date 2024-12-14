@@ -16,7 +16,7 @@ async def transcribe_audio(file_path: str) -> dict:
 
     try:
         with open(file_path, "rb") as audio:
-            source = {"buffer": audio, "mimetype": "audio/wav"} 
+            source = {"buffer": audio, "mimetype": "audio/wav"}
             options = {"punctuate": True}
             response = await dg_client.transcription.prerecorded(source, options)
             return response
